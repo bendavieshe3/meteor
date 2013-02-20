@@ -121,14 +121,14 @@ var start_proxy = function (outer_port, inner_port, callback) {
     } else if (Status.listening) {
       // server is listening. things are hunky dory!
       proxy.proxyRequest(req, res, {
-        host: '127.0.0.1', port: inner_port
+        host: process.env.IP, port: inner_port
       });
     } else {
       // Not listening yet. Queue up request.
       var buffer = httpProxy.buffer(req);
       request_queue.push(function () {
         proxy.proxyRequest(req, res, {
-          host: '127.0.0.1', port: inner_port,
+          host: process.env.IP, port: inner_port,
           buffer: buffer
         });
       });
@@ -140,14 +140,14 @@ var start_proxy = function (outer_port, inner_port, callback) {
     if (Status.listening) {
       // server is listening. things are hunky dory!
       p.proxy.proxyWebSocketRequest(req, socket, head, {
-        host: '127.0.0.1', port: inner_port
+        host: process.env.IP, port: inner_port
       });
     } else {
       // Not listening yet. Queue up request.
       var buffer = httpProxy.buffer(req);
       request_queue.push(function () {
         p.proxy.proxyWebSocketRequest(req, socket, head, {
-          host: '127.0.0.1', port: inner_port,
+          host: process.env.IP, port: inner_port,
           buffer: buffer
         });
       });
@@ -179,7 +179,7 @@ var start_proxy = function (outer_port, inner_port, callback) {
     res.end('Unexpected error.');
   });
 
-  p.listen(outer_port, callback);
+  p.listen(outer_port, process.env.IP, callback);
 };
 
 ////////// MongoDB //////////
@@ -541,16 +541,16 @@ exports.getSettings = function (filename) {
 // can't continue. If you change this, remember to call
 // watcher.destroy() as appropriate.
 exports.run = function (app_dir, bundle_opts, port, once, settingsFile) {
-  var outer_port = port || 3000;
-  var inner_port = outer_port + 1;
-  var mongo_port = outer_port + 2;
-  var test_port = outer_port + 3;
+  var outer_port = port || process.env.PORT;
+  var inner_port = 16010;
+  var mongo_port = 16000;
+  var test_port = 16011;
   var bundle_path = path.join(app_dir, '.meteor', 'local', 'build');
   var test_bundle_path = path.join(app_dir, '.meteor', 'local', 'build_test');
   // Allow override and use of external mongo. Matches code in launch_mongo.
   var mongo_url = process.env.MONGO_URL ||
-        ("mongodb://127.0.0.1:" + mongo_port + "/meteor");
-  var test_mongo_url = "mongodb://127.0.0.1:" + mongo_port + "/meteor_test";
+        ("mongodb://" + process.env.IP + ":" + mongo_port + "/meteor");
+  var test_mongo_url = "mongodb://" + process.env.IP + ":" + mongo_port + "/meteor_test";
 
   var test_bundle_opts;
 
@@ -760,7 +760,7 @@ exports.run = function (app_dir, bundle_opts, port, once, settingsFile) {
       process.stdout.write("Initializing mongo database... this may take a moment.\n");
     }, 3000);
     process_startup_printer = function () {
-      process.stdout.write("Running on: http://localhost:" + outer_port + "/\n");
+      process.stdout.write("Running on: http://" + process.env.IP + ":" + outer_port + "/\n");
     };
 
     start_update_checks();

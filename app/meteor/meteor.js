@@ -96,7 +96,7 @@ Fiber(function () {
       // reparse args
       // This help logic should probably move to run.js eventually
       var opt = require('optimist')
-            .alias('port', 'p').default('port', 3000)
+            .alias('port', 'p').default('port', process.env.PORT)
             .describe('port', 'Port to listen on. NOTE: Also uses port N+1 and N+2.')
             .boolean('production')
             .describe('production', 'Run in production mode. Minify and bundle CSS and JS files.')
@@ -485,7 +485,7 @@ Fiber(function () {
             process.exit(1);
           }
 
-          var mongo_url = "mongodb://127.0.0.1:" + mongod_port + "/meteor";
+          var mongo_url = "mongodb://" + process.env.IP + ":" + mongod_port + "/meteor";
 
           if (new_argv.url)
             console.log(mongo_url);
